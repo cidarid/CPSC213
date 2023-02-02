@@ -18,12 +18,12 @@
                  ld 12(r0), r7          # q[3] => r7
                  add r1, r7             # *y + q[3] => r7
                  st r7, (r6)            # *y + q[3] => *y
-                 halt
+                 halt                   # halt
 
 .pos 0x1000
-s:               .long 0x0
-b:               .long 0x0
-y:               .long 0x0
+s:               .long 0x0              # s
+b:               .long 0x0              # b
+y:               .long 0x0              # y
 
 .pos 0x2000
 q:               .long 0x10             # q[0]
