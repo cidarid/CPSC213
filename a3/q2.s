@@ -1,3 +1,4 @@
+//todo: THIS DOES NOT SET tos OR s[n] CORRECTLY
 .pos 0x100
             ld $0, r0           # 0 => r0
             ld $tos, r1         # &tos => r1  
@@ -36,15 +37,16 @@
 
             ld (r4, r1, 4), r5  # s[tos] => r5
             add r2, r5          # tmp + s[tos] => r5
+            halt
 
 .pos 0x1000
 tos:        .long 0x0 # tos
 tmp:        .long 0x0 # tmp
 
 .pos 0x2000
-a:          .long 0x0 # a[0]
-            .long 0x0 # a[1]
-            .long 0x0 # a[2]
+a:          .long 0xc # a[0] = 12
+            .long 0x1f # a[1] = 31 
+            .long 0x2 # a[2] = 2
 
 .pos 0x3000
 s:          .long 0x0 # s[0]
