@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
     fprintf(stderr, "Static limit of 4 numbers\n");
     return -1;
   }
-  // Checks to make sure all inputs are numbers I'm pretty sure, if yes ends
-  // program
+  // Checks to make sure all inputs are numbers if not ends program
   for (int i = 0; i < n; i++) {
     val[i] = strtol(argv[i + 1], &ep, 10);
     if (*ep) {
