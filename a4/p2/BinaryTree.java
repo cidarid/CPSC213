@@ -68,7 +68,8 @@ public class BinaryTree {
       if (parent != null) {
         parent.printPath();
       }
-      out.printf("%s: %d\n", parent == null ? "from root" : parent.left == this ? "left to" : "right to", value);
+      out.printf("%s: %d\n",
+          parent == null ? "from root" : parent.left == this ? "left to" : "right to", value);
     }
 
   }

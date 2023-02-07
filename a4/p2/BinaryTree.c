@@ -6,21 +6,41 @@
  * and pointers to its right and left children (or null).
  */
 struct Node {
-  // TODO
+  int value;
+  struct Node* parent;
+  struct Node* left;
+  struct Node* right;
 };
 
 /**
  * Create a new node with no children.
  */
 struct Node* create(int value) {
-  // TODO
-  return NULL;
+  struct Node* node = malloc(sizeof(struct Node));
+  node->value = value;
+  return node;
 }
 
 /**
  * Insert the node n into the binary tree rooted by toNode.
  */
 void insert(struct Node* toNode, struct Node* n) {
+  struct Node* this = toNode;
+  if (n->value <= this->value) {
+    if (this->left == NULL) {
+      this->left = n;
+      n->parent = this;
+    } else {
+      insert(this->left, n);
+    }
+  } else {
+    if (this->right == NULL) {
+      this->right = n;
+      n->parent = this;
+    } else {
+      insert(this->right, n);
+    }
+  }
   // TODO
 }
 
@@ -28,7 +48,9 @@ void insert(struct Node* toNode, struct Node* n) {
  * Print the contents entire binary tree in order of ascending integer value.
  */
 void printInOrder(struct Node* node) {
-  // TODO
+  if (node->left != NULL) printInOrder(node->left);
+  printf("%d\n", node->value);
+  if (node->right != NULL) printInOrder(node->right);
 }
 
 /**
@@ -37,7 +59,16 @@ void printInOrder(struct Node* node) {
  * parent to arive at node.
  */
 void printPath(struct Node* node) {
-  // TODO
+  if (node->parent != NULL) {
+    printPath(node->parent);
+  }
+  printf("%s: %d\n",
+         // If node is root
+         node->parent == NULL ? "from root"
+         // If node is left node, if not it must be right node
+         : node->parent->left == node ? "left to"
+                                      : "right to",
+         node->value);
 }
 
 /**
@@ -61,8 +92,7 @@ int main(int argc, char* argv[]) {
   if (root) {
     printf("In Order:\n");
     printInOrder(root);
-    printf("Path to %d:\n", 0);  // TODO: replace 0 with expression that gets
-                                 // value of lastNodeInserted
+    printf("Path to %d:\n", lastNodeInserted->value);
     printPath(lastNodeInserted);
   }
 }
