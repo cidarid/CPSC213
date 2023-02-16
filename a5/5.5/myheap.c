@@ -65,10 +65,11 @@ static void set_block_header(void *block_start, int block_size, int in_use) {
 }
 
 static void set_footer_header(void *block_start, int block_size, int in_use) {
-  printf("Setting header at %p to 0x%x\n", block_start, block_size);
+  printf("Setting header at %p to 0x%x. It is %d.\n", block_start, block_size,
+         in_use);
   set_block_header(block_start, block_size, in_use);
-  printf("Setting footer at %p to 0x%x\n", block_start + block_size - 8,
-         block_size);
+  printf("Setting footer at %p to 0x%x. It is %d.\n",
+         block_start + block_size - 8, block_size, in_use);
   set_block_header(block_start + block_size - 8, block_size, in_use);
 }
 
@@ -183,7 +184,9 @@ struct myheap *heap_create(unsigned int size) {
  * block with the previous and the next block, if they are also free.
  */
 void myheap_free(struct myheap *h, void *payload) {
-  /* TO BE COMPLETED BY THE STUDENT. */
+  long *header = payload - 8;
+  long block_size = get_block_size(header);
+  set_footer_header(header, block_size, 0);
 }
 
 /*
@@ -217,6 +220,7 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
 int main() {
   struct myheap *h = heap_create(0x100);
   long *pos = myheap_malloc(h, 0xa0);
+  myheap_free(h, get_payload(pos));
   if (pos == NULL) {
     printf("null");
     return 0;
