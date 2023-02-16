@@ -200,7 +200,8 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
   // End address of heap
   long *end_address = h->start + h->size;
   // Loop from first block to last block
-  for (long *pos = h->start; pos < end_address; pos += *pos / 8) {
+  long *pos = h->start;
+  while (pos < end_address) {
     // If block is in use, go to next
     if (block_is_in_use(pos)) continue;
     long size_of_block = get_block_size(pos);
@@ -211,6 +212,7 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
     // Set block header to allocated_size and mark it as in use
     set_footer_header(pos, allocated_size, 1);
     return pos;
+    pos = get_next_block(pos);
   }
   // No blocks found that can fit request
   return NULL;
@@ -219,7 +221,8 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
 int main() {
   struct myheap *h = heap_create(0x100);
   long *pos = myheap_malloc(h, 0x50);
-  if (pos == NULL) {
+  long *pos2 = myheap_malloc(h, 0x30);
+  if (pos == NULL || pos2 == NULL) {
     printf("null");
     return 0;
   }
