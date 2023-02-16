@@ -194,6 +194,8 @@ void myheap_free(struct myheap *h, void *payload) {
   long *header = payload - 8;
   long block_size = get_block_size(header);
   set_footer_header(header, block_size, 0);
+  coalesce(h, header);
+  if (!is_first_block(h, header)) coalesce(h, get_previous_block(header));
 }
 
 /*
