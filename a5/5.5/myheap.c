@@ -65,9 +65,9 @@ static void set_block_header(void *block_start, int block_size, int in_use) {
 }
 
 static void set_footer_header(void *block_start, int block_size, int in_use) {
-  printf("Setting header at %p to %x\n", block_start, block_size);
+  printf("Setting header at %p to 0x%x\n", block_start, block_size);
   set_block_header(block_start, block_size, in_use);
-  printf("Setting footer at %p to %x\n", block_start + block_size - 8,
+  printf("Setting footer at %p to 0x%x\n", block_start + block_size - 8,
          block_size);
   set_block_header(block_start + block_size - 8, block_size, in_use);
 }
@@ -198,21 +198,17 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
   // Necessary size to allocate with padding
   int allocated_size = get_size_to_allocate(user_size);
   // End address of heap
-  long *end_address = h->start + h->size;
+  void *end_address = h->start + h->size;
   // Loop from first block to last block
-  long *pos = h->start;
-  while (pos < end_address) {
+  for (void *pos = h->start; pos < end_address; pos = get_next_block(pos)) {
     // If block is in use, go to next
     if (block_is_in_use(pos)) continue;
     long size_of_block = get_block_size(pos);
-    printf("size_of_block: %ld, size_needed: %d\n", size_of_block,
-           allocated_size);
     // If block can't fit value, go to next
-    if (size_of_block < allocated_size) continue;
-    // Set block header to allocated_size and mark it as in use
-    set_footer_header(pos, allocated_size, 1);
+    if (size_of_block < allocated_size) continue;  // in here
+    // Split new block off and mark used
+    split_and_mark_used(h, pos, allocated_size);
     return pos;
-    pos = get_next_block(pos);
   }
   // No blocks found that can fit request
   return NULL;
@@ -220,14 +216,15 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
 
 int main() {
   struct myheap *h = heap_create(0x100);
-  long *pos = myheap_malloc(h, 0x50);
-  long *pos2 = myheap_malloc(h, 0x30);
-  if (pos == NULL || pos2 == NULL) {
+  long *pos = myheap_malloc(h, 0xa0);
+  if (pos == NULL) {
     printf("null");
     return 0;
   }
-  printf("%ld\n", *pos);
-  printf("%ld\n", *(pos + 6));
-  long *split_block = split_and_mark_used(h, pos, 32);
-  printf("%p\n", split_block);
+  printf("%p\n", pos);
+  // printf("%p\n", pos2);
+  // printf("%x\n", *(pos2 + (*pos2 / 8)));
+  // printf("%ld\n", *(pos + 6));
+  // long *split_block = split_and_mark_used(h, pos, 32);
+  // printf("%p\n", split_block);
 }
