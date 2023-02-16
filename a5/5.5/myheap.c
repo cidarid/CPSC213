@@ -1,8 +1,8 @@
+#include "myheap.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
-
-#include "myheap.h"
 
 #define HEADER_SIZE 8
 
@@ -10,25 +10,24 @@
  * Struct used to represent the heap.
  */
 struct myheap {
-    long size;                /* Size of the heap in bytes. */
-    void *start;             /* Start address of the heap area. */
+  long size;   /* Size of the heap in bytes. */
+  void *start; /* Start address of the heap area. */
 };
 
 /*
  * Determine whether or not a block is in use.
  */
 static int block_is_in_use(void *block_start) {
-
-  return 1 & *((long *) block_start);
+  return 1 & *((long *)block_start);
 }
 
 /*
  * Return the size of a block.
  */
 static int get_block_size(void *block_start) {
-
   long *header = block_start;
-  // remove the last bit from header (i.e, the alloc bit) and return the result (i.e., the block size)
+  // remove the last bit from header (i.e, the alloc bit) and return the result
+  // (i.e., the block size)
   return *header & 0xfffffffffffffffe;
 }
 
@@ -36,7 +35,6 @@ static int get_block_size(void *block_start) {
  * Return the size of the payload of a block.
  */
 static int get_payload_size(void *block_start) {
-  
   return get_block_size(block_start) - HEADER_SIZE * 2;
 }
 
@@ -44,7 +42,6 @@ static int get_payload_size(void *block_start) {
  * Find the start of the block, given a pointer to the payload.
  */
 static void *get_block_start(void *payload) {
-  
   return payload - HEADER_SIZE;
 }
 
@@ -52,7 +49,6 @@ static void *get_block_start(void *payload) {
  * Find the payload, given a pointer to the start of the block.
  */
 static void *get_payload(void *block_start) {
-  
   return block_start + HEADER_SIZE;
 }
 
@@ -61,20 +57,17 @@ static void *get_payload(void *block_start) {
  * each block has two copies of the header (one at each end).
  */
 static void set_block_header(void *block_start, int block_size, int in_use) {
-  
   long header_value = block_size | in_use;
   long *header_position = block_start;
   long *trailer_position = block_start + block_size - HEADER_SIZE;
-  *header_position  = header_value;
+  *header_position = header_value;
   *trailer_position = header_value;
 }
-
 
 /*
  * Find the start of the next block.
  */
 static void *get_next_block(void *block_start) {
-  
   return block_start + get_block_size(block_start);
 }
 
@@ -82,7 +75,6 @@ static void *get_next_block(void *block_start) {
  * Find the start of the previous block.
  */
 static void *get_previous_block(void *block_start) {
-  
   return block_start - get_block_size(block_start - HEADER_SIZE);
 }
 
@@ -90,7 +82,6 @@ static void *get_previous_block(void *block_start) {
  * Determine whether or not the given block is at the front of the heap.
  */
 static int is_first_block(struct myheap *h, void *block_start) {
-  
   return block_start == h->start;
 }
 
@@ -98,7 +89,6 @@ static int is_first_block(struct myheap *h, void *block_start) {
  * Determine whether or not the given block is at the end of the heap.
  */
 static int is_last_block(struct myheap *h, void *block_start) {
-  
   return get_next_block(block_start) == h->start + h->size;
 }
 
@@ -106,10 +96,10 @@ static int is_last_block(struct myheap *h, void *block_start) {
  * Determine whether or not the given address is inside the heap
  * region. Can be used to loop through all blocks:
  *
- * for (blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk)) ...
+ * for (blk = h->start; is_within_heap_range(h, blk); blk = get_next_block(blk))
+ * ...
  */
 static int is_within_heap_range(struct myheap *h, void *addr) {
-  
   return addr >= h->start && addr < h->start + h->size;
 }
 
@@ -117,10 +107,9 @@ static int is_within_heap_range(struct myheap *h, void *addr) {
  * Coalesce free space for single block pair
  * Joins first_block_start and its consecutive next block
  * if and only if both blocks are free and first_block_start
- * has a next block in the heap. 
+ * has a next block in the heap.
  */
 static void *coalesce(struct myheap *h, void *first_block_start) {
-  
   /* TO BE COMPLETED BY THE STUDENT. */
   return NULL;
 }
@@ -132,9 +121,12 @@ static void *coalesce(struct myheap *h, void *first_block_start) {
  * of HEADER_SIZE.
  */
 static int get_size_to_allocate(int user_size) {
-  
-  /* TO BE COMPLETED BY THE STUDENT. */
-  return 0;
+  user_size += 16;
+  // If to_pad % HEADER_SIZE != 0, add the necessary amount to make to_pad
+  // divisible by HEADER_SIZE
+  if (user_size % HEADER_SIZE)
+    user_size += HEADER_SIZE - (user_size % HEADER_SIZE);
+  return user_size;
 }
 
 /*
@@ -146,8 +138,8 @@ static int get_size_to_allocate(int user_size) {
  * the first as in use, the second as free. Otherwise just marks the
  * block as in use. Returns the payload of the block marked as in use.
  */
-static void *split_and_mark_used(struct myheap *h, void *block_start, int needed_size) {
-
+static void *split_and_mark_used(struct myheap *h, void *block_start,
+                                 int needed_size) {
   /* TO BE COMPLETED BY THE STUDENT. */
   return NULL;
 }
@@ -155,12 +147,12 @@ static void *split_and_mark_used(struct myheap *h, void *block_start, int needed
 /*
  * Create a heap that is "size" bytes large.
  */
-struct myheap *heap_create(unsigned int size)
-{
+struct myheap *heap_create(unsigned int size) {
   /* Allocate space in the process' actual heap */
-  void *heap_start = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-  if (heap_start == (void *) -1) return NULL;
-  
+  void *heap_start = mmap(NULL, size, PROT_READ | PROT_WRITE,
+                          MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (heap_start == (void *)-1) return NULL;
+
   /* Use the first part of the allocated space for the heap header */
   struct myheap *h = heap_start;
   h->size = size - sizeof(struct myheap);
@@ -177,17 +169,18 @@ struct myheap *heap_create(unsigned int size)
  * block with the previous and the next block, if they are also free.
  */
 void myheap_free(struct myheap *h, void *payload) {
-  
   /* TO BE COMPLETED BY THE STUDENT. */
 }
 
 /*
- * Malloc a block on the heap h. 
- * Return a pointer to the block's payload in case of success, 
+ * Malloc a block on the heap h.
+ * Return a pointer to the block's payload in case of success,
  * or NULL if no block large enough to satisfy the request exists.
  */
 void *myheap_malloc(struct myheap *h, unsigned int user_size) {
-  
+  // Step 1: Find a block that will fit user_size + 16 (header & footer)
+  // int actual_size = pad_to_8(user_size) + 16;
+  // Step 2:
   /* TO BE COMPLETED BY THE STUDENT. */
   return NULL;
 }
