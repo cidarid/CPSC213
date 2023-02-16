@@ -62,15 +62,16 @@ static void set_block_header(void *block_start, int block_size, int in_use) {
   long *trailer_position = block_start + block_size - HEADER_SIZE;
   *header_position = header_value;
   *trailer_position = header_value;
+  // printf("Setting %p to 0x%x. It is %d.\n", block_start, block_size, in_use);
+}
+
+static void set_block_footer(void *block_start, int block_size, int in_use) {
+  set_block_header(block_start + block_size - 8, block_size, in_use);
 }
 
 static void set_footer_header(void *block_start, int block_size, int in_use) {
-  printf("Setting header at %p to 0x%x. It is %d.\n", block_start, block_size,
-         in_use);
   set_block_header(block_start, block_size, in_use);
-  printf("Setting footer at %p to 0x%x. It is %d.\n",
-         block_start + block_size - 8, block_size, in_use);
-  set_block_header(block_start + block_size - 8, block_size, in_use);
+  set_block_footer(block_start, block_size, in_use);
 }
 
 /*
@@ -119,8 +120,14 @@ static int is_within_heap_range(struct myheap *h, void *addr) {
  * has a next block in the heap.
  */
 static void *coalesce(struct myheap *h, void *first_block_start) {
-  /* TO BE COMPLETED BY THE STUDENT. */
-  return NULL;
+  if (block_is_in_use(first_block_start) || is_last_block(h, first_block_start))
+    return NULL;
+  void *next_block = get_next_block(first_block_start);
+  if (block_is_in_use(next_block)) return NULL;
+  int total_size =
+      get_block_size(first_block_start) + get_block_size(next_block);
+  set_block_header(first_block_start, total_size, 0);
+  set_block_footer(first_block_start, total_size, 0);
 }
 
 /*
@@ -219,13 +226,7 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
 
 int main() {
   struct myheap *h = heap_create(0x100);
-  long *pos = myheap_malloc(h, 0xa0);
   myheap_free(h, get_payload(pos));
-  if (pos == NULL) {
-    printf("null");
-    return 0;
-  }
-  printf("%p\n", pos);
   // printf("%p\n", pos2);
   // printf("%x\n", *(pos2 + (*pos2 / 8)));
   // printf("%ld\n", *(pos + 6));
