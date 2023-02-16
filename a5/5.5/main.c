@@ -215,6 +215,8 @@ int test_random(struct testfunc *tf) {
     } else {
       void *ptr = myheap_malloc(tf->heap, sizes[idx]);
       if (0 != check_alloc(tf, ptr, sizes[idx], ptrs, sizes, RAND_NBUCKETS)) {
+        printf("Tried mallocing a block of size %d to block starting at %p.\n",
+               sizes[idx], ptr);
         return -1;
       }
       ptrs[idx] = ptr;
