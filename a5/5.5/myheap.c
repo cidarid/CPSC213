@@ -141,7 +141,7 @@ static int get_size_to_allocate(int user_size) {
 static void *split_and_mark_used(struct myheap *h, void *block_start,
                                  int needed_size) {
   // Check if block can be split
-  /*long orig_size = get_block_size(block_start);
+  long orig_size = get_block_size(block_start);
   long wasted_space = orig_size - needed_size;
   // If it can be split
   if (wasted_space >= 3 * HEADER_SIZE) {
@@ -152,6 +152,7 @@ static void *split_and_mark_used(struct myheap *h, void *block_start,
     // Split the block into two blocks
     // Modify original header/block at:
     // address: block_start
+    set_block_header(block_start, needed_size, 1);
     block_start = top_block_header_val;
     // A new footer gets added at:
     // address: block_start + needed_size - 8
@@ -162,7 +163,7 @@ static void *split_and_mark_used(struct myheap *h, void *block_start,
     // Modify original footer/block end at:
     // address: block_start + orig_size - 8
     *((char *)block_start + orig_size - 8) = bottom_block_size;
-  }*/
+  }
   return block_start + 8;
 }
 
@@ -219,6 +220,7 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
     // Block can fit allocated value, set block header to allocated_size and
     // mark it as in use
     set_block_header(pos, allocated_size, 1);
+    set_block_header(pos + (allocated_size / 8) - 1, allocated_size, 1);
     return pos;
   }
   // No blocks found that can fit request
@@ -227,10 +229,11 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
 
 int main() {
   struct myheap *h = heap_create(80);
-  long *pos = myheap_malloc(h, 80 - 16 - 16);
+  long *pos = myheap_malloc(h, 8);
   if (pos == NULL) {
     printf("null");
     return 0;
   }
   printf("%ld", *pos);
+  printf("%ld", *(pos + 2));
 }
