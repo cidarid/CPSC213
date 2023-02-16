@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 
 #define HEADER_SIZE 8
+#define MB 1024 * 1024
 
 /*
  * Struct used to represent the heap.
@@ -66,12 +67,9 @@ static void set_block_header(void *block_start, int block_size, int in_use) {
 }
 
 static void set_block_footer(void *block_start, int block_size, int in_use) {
+  printf("block start: %p, block_set_pos: %p, block_size: %d, in_use: %d\n",
+         block_start, block_start + block_size - 8, block_size, in_use);
   set_block_header(block_start + block_size - 8, block_size, in_use);
-}
-
-static void set_footer_header(void *block_start, int block_size, int in_use) {
-  set_block_header(block_start, block_size, in_use);
-  set_block_footer(block_start, block_size, in_use);
 }
 
 /*
@@ -127,7 +125,11 @@ static void *coalesce(struct myheap *h, void *first_block_start) {
   int total_size =
       get_block_size(first_block_start) + get_block_size(next_block);
   set_block_header(first_block_start, total_size, 0);
-  set_block_footer(first_block_start, total_size, 0);
+  printf(
+      "Setting block footer of block starting at %p with a total size of %d.\n",
+      first_block_start, total_size);
+  set_block_header(first_block_start, total_size, 0);  // right here
+  return first_block_start;
 }
 
 /*
@@ -160,8 +162,8 @@ static void *split_and_mark_used(struct myheap *h, void *block_start,
   long wasted_space = get_block_size(block_start) - needed_size;
   // If it can be split
   if (wasted_space >= 3 * HEADER_SIZE) {
-    set_footer_header(block_start, needed_size, 1);
-    set_footer_header(block_start + needed_size, wasted_space, 0);
+    set_block_header(block_start, needed_size, 1);
+    set_block_header(block_start + needed_size, wasted_space, 0);
   }
   return block_start + 8;
 }
@@ -193,7 +195,7 @@ struct myheap *heap_create(unsigned int size) {
 void myheap_free(struct myheap *h, void *payload) {
   long *header = payload - 8;
   long block_size = get_block_size(header);
-  set_footer_header(header, block_size, 0);
+  set_block_header(header, block_size, 0);
   coalesce(h, header);
   if (!is_first_block(h, header)) coalesce(h, get_previous_block(header));
 }
@@ -217,21 +219,18 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
     if (block_is_in_use(pos)) continue;
     long size_of_block = get_block_size(pos);
     // If block can't fit value, go to next
-    if (size_of_block < allocated_size) continue;  // in here
+    if (size_of_block < allocated_size) continue;
     // Split new block off and mark used
     split_and_mark_used(h, pos, allocated_size);
-    return pos;
+    return get_payload(pos);
   }
   // No blocks found that can fit request
   return NULL;
 }
 
 int main() {
-  struct myheap *h = heap_create(0x100);
-  myheap_free(h, get_payload(pos));
-  // printf("%p\n", pos2);
-  // printf("%x\n", *(pos2 + (*pos2 / 8)));
-  // printf("%ld\n", *(pos + 6));
-  // long *split_block = split_and_mark_used(h, pos, 32);
-  // printf("%p\n", split_block);
+  struct myheap *h = heap_create(0x3000);
+  printf("Heap end address is %p\n", h->start + h->size);
+  void *block = myheap_malloc(h, 16);
+  myheap_free(h, block);
 }
