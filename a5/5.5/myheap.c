@@ -63,9 +63,6 @@ static void set_block_header(void *block_start, int block_size, int in_use) {
   long *trailer_position = block_start + block_size - HEADER_SIZE;
   *header_position = header_value;
   *trailer_position = header_value;
-  /*printf("Setting block at [%p,%p] to 0x%x. It is %s.\n", block_start,
-         block_start + block_size, block_size,
-         (in_use ? "in use" : "not in use"));*/
 }
 
 /*
@@ -156,9 +153,6 @@ void print_block(struct myheap *h, void *pos, int highlight) {
 
 void print_blocks(struct myheap *h, void *to_highlight) {
   void *end_address = h->start + h->size;
-  /*for (void *pos = h->start; pos < end_address; pos = get_next_block(pos)) {
-    print_block(h, pos, 0);
-  }*/
   // print block behind, print block in front
 
   if (!is_first_block(h, to_highlight)) {
@@ -189,21 +183,10 @@ static void *split_and_mark_used(struct myheap *h, void *block_start,
   long wasted_space = get_block_size(block_start) - needed_size;
   // If it can be split
   if (wasted_space >= 3 * HEADER_SIZE) {
-    printf("Splitting block %p.\n\n", block_start);
-    printf("Before split: \n");
-    print_blocks(h, block_start);
     set_block_header(block_start, needed_size, 1);
-    // printf("1st block: At %p with a size of %d.\n", block_start,
-    // needed_size);
     set_block_header(block_start + needed_size, wasted_space, 0);
-    // printf("2nd block: At %p with a size of %ld.\n", block_start +
-    // needed_size, wasted_space);
-    printf("After split: \n");
-    print_blocks(h, block_start);
-  } else {
-    printf("Block %p couldn't be split.\n", block_start);
+  } else
     set_block_header(block_start, get_block_size(block_start), 1);
-  }
   return get_payload(block_start);
 }
 
@@ -237,7 +220,6 @@ void myheap_free(struct myheap *h, void *payload) {
   set_block_header(header, block_size, 0);
   coalesce(h, header);
   if (!is_first_block(h, header)) coalesce(h, get_previous_block(header));
-  // print_blocks(h, header);
 }
 
 /*
@@ -260,23 +242,10 @@ void *myheap_malloc(struct myheap *h, unsigned int user_size) {
     long size_of_block = get_block_size(pos);
     // If block can't fit value, go to next
     if (size_of_block < allocated_size) continue;
-    // printf("pos is currently at %p\n", pos);
     // Split new block off and mark used
     void *payload = split_and_mark_used(h, pos, allocated_size);
-    // if ((long)pos & 0x1d88 == 0x1d88) printf("here");
-    // printf("Allocated to %p\n", get_payload(pos));
-    printf("Mallocing block %p to %p with a size of %d.\n", pos,
-           pos + allocated_size, allocated_size);
-    print_blocks(h, pos);
     return payload;
   }
   // No blocks found that can fit request
   return NULL;
 }
-
-/*int main() {
-  struct myheap *h = heap_create(0x3000);
-  printf("Heap end address is %p\n", h->start + h->size);
-  void *block = myheap_malloc(h, 16);
-  myheap_free(h, block);
-}*/
