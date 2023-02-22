@@ -4,6 +4,7 @@
 .idea
 output
 
+*.dSYM
 *.class
 
 a5/5.5/webpage/*
