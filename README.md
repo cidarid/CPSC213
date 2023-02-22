@@ -12,7 +12,7 @@ In Assignment 2, I began working with assembly code (SM213). I was given program
 
 ## A3
 
-From Assignment 3 onwards, I worked in a group with another student. In A3, I worked on converting a [given bubble sort algorithm in C](/a3/bubble_sort_static.c), to use dynamic arrays in (bubble_sort_dynamic.c)(/a3/bubble_sort_dynamic.c), and then eventually to only use pointer arithmetic and no square brackets in [bubble_sort_awesome.c](/a3/bubble_sort_awesome.c). All other work in a3 was done by my partner.
+From Assignment 3 onwards, I worked in a group with another student. In A3, I worked on converting a [given bubble sort algorithm in C](/a3/bubble_sort_static.c), to use dynamic arrays in [bubble_sort_dynamic.c](/a3/bubble_sort_dynamic.c), and then eventually to only use pointer arithmetic and no square brackets in [bubble_sort_awesome.c](/a3/bubble_sort_awesome.c). All other work in a3 was done by my partner.
 
 ## A4
 
