@@ -7,6 +7,4 @@ output
 *.dSYM
 *.class
 
-a5/5.5/webpage/*
-a2/p1
-a4/p3/helpers
+helpers/
