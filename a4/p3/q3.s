@@ -47,4 +47,4 @@ s_z_z:  .long 0       # s.z->z->x[0]
         .long s_z_z_y # s.z->z->y
         .long 0       # s.z->z->z
 s_z_z_y:.long 0       # s.z->z->y[0]
-        .long 30       # s.z.z.->[1]
+        .long 30      # s.z.z.->[1]
