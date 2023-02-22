@@ -111,12 +111,15 @@ static int is_within_heap_range(struct myheap *h, void *addr) {
  * has a next block in the heap.
  */
 static void *coalesce(struct myheap *h, void *first_block_start) {
+  // If passed block is in use or passed block is last block
   if (block_is_in_use(first_block_start) || is_last_block(h, first_block_start))
     return NULL;
   void *next_block = get_next_block(first_block_start);
+  // If subsequent block is in use
   if (block_is_in_use(next_block)) return NULL;
   int total_size =
       get_block_size(first_block_start) + get_block_size(next_block);
+  // Combine blocks
   set_block_header(first_block_start, total_size, 0);
   return get_payload(first_block_start);
 }
@@ -149,12 +152,15 @@ static void *split_and_mark_used(struct myheap *h, void *block_start,
                                  int needed_size) {
   // Check if block can be split
   long wasted_space = get_block_size(block_start) - needed_size;
-  // If it can be split
+  // If the block can be split, split it
   if (wasted_space >= 3 * HEADER_SIZE) {
     set_block_header(block_start, needed_size, 1);
     set_block_header(block_start + needed_size, wasted_space, 0);
-  } else
+  }
+  // If the block can't be split, just mark the entire block as used
+  else {
     set_block_header(block_start, get_block_size(block_start), 1);
+  }
   return get_payload(block_start);
 }
 
@@ -185,6 +191,7 @@ struct myheap *heap_create(unsigned int size) {
 void myheap_free(struct myheap *h, void *payload) {
   long *header = payload - 8;
   long block_size = get_block_size(header);
+  // Set block as not in use
   set_block_header(header, block_size, 0);
   coalesce(h, header);
   if (!is_first_block(h, header)) coalesce(h, get_previous_block(header));
@@ -196,9 +203,6 @@ void myheap_free(struct myheap *h, void *payload) {
  * or NULL if no block large enough to satisfy the request exists.
  */
 void *myheap_malloc(struct myheap *h, unsigned int user_size) {
-  // size of heap: h->size, addr of start pos: h->start, addr of end pos:
-  // h->start + h->size, addr of header: h->start, value of header: *(h->start)
-
   // Necessary size to allocate with padding
   int allocated_size = get_size_to_allocate(user_size);
   // End address of heap
