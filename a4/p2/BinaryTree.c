@@ -41,7 +41,6 @@ void insert(struct Node* toNode, struct Node* n) {
       insert(this->right, n);
     }
   }
-  // TODO
 }
 
 /**
