@@ -1,7 +1,8 @@
 import static java.lang.System.out;
 
 public class Endianness {
-    
+
+    // Returns the big endian value of a hex array
     public static int bigEndianValue(Byte[] mem) {
         int temp = 0;
         for (int i = 0; i < mem.length; i++) {
@@ -12,6 +13,7 @@ public class Endianness {
         return temp;
     }
 
+    // Returns the little endian value of a hex array
     public static int littleEndianValue(Byte[] mem) {
         int temp = 0;
         for (int i = 0; i < mem.length; i++) {
