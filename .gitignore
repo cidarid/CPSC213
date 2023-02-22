@@ -1,6 +1,8 @@
 
 .DS_Store
-.vscode/settings.json
+.vscode
+.idea
+output
 
 a3/q1
 a3/q2
