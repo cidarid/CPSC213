@@ -16,8 +16,9 @@ inc r2                # i++
 br loop
 end_loop:
 shr $2, r4             # total /= 4
-ld $avg, r6
-st r4, (r6)            
+ld $0x18, r5
+add r0, r5
+st r4, (r5)           
 
 
 
