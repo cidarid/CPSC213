@@ -32,6 +32,21 @@ st r6, (r0)
 inca r0
 br list_avg          
 end_list_avg:
+ld $base, r0
+ld $24, r1
+add r0, r1
+ld $-6, r4
+swap_loop:
+beq r4, end_swap_loop
+ld (r0), r2
+ld (r1), r3
+st r3, (r0)
+st r2, (r1)
+inca r0
+inca r1
+inc r4
+br swap_loop
+end_swap_loop:
 halt
 
 
