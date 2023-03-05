@@ -23,12 +23,27 @@ st r4, (r5)
 
 
 .pos 0x2000
-n:      .long 1       # just one student
+n:      .long 4       # Count of students
 m:      .long 0       # put the answer here
 s:      .long base    # address of the array
-base:   .long 1234    # student ID
-        .long 80      # grade 0
+base:   .long 1234    # student 1 ID
+        .long 10      # grade 0
+        .long 20      # grade 1
+        .long 30      # grade 2
+        .long 40      # grade 3
+        .long 3456    # student 2 ID
+        .long 50      # grade 0
         .long 60      # grade 1
-        .long 78      # grade 2
-        .long 90      # grade 3
+        .long 70      # grade 2
+        .long 80      # grade 3
+        .long 4269    # student 3 ID
+        .long 00     # grade 0
+        .long 00      # grade 1
+        .long 00      # grade 2
+        .long 00      # grade 3
+        .long 8008    # student 4 ID
+        .long 100     # grade 0
+        .long 100     # grade 1
+        .long 100     # grade 2
+        .long 100     # grade 3
 avg:    .long 0       # computed average     
