@@ -49,7 +49,7 @@ inca r1
 inc r4
 br swap_loop
 end_swap_loop:
-j r6
+j (r6)
 end:
 halt
 
