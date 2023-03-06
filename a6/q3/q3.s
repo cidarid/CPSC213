@@ -2,6 +2,8 @@
 code:
 ld $s, r0             # &s into r0
 ld (r0), r0           # s into r0
+
+# Initializing external for loop values (i = 0; i < n; i++)
 ld $0, r1             # i
 ld $n, r2     
 ld (r2), r2        
@@ -12,6 +14,8 @@ list_avg:
 mov r1, r5            # i => r5
 add r2, r5            # i - n => r5
 beq r5, end_list_avg  # if (i - n) == 0 (i.e. i >= n), branch
+
+# Initializing internal for loop values (j = 0; j < 4; j++)
 ld $0, r3             # j
 ld $-4, r4            # j offset
 ld $0, r6             # total for student
@@ -30,9 +34,11 @@ end_s_avg:
 shr $2, r6             # total /= 4
 st r6, (r0)
 inca r0
-br list_avg          
+br list_avg
+
 end_list_avg:
-j end
+j bubble
+
 swap:
 ld $base, r0
 ld $24, r1
