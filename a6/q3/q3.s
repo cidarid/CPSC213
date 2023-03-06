@@ -121,7 +121,7 @@ halt
 
 
 .pos 0x2000
-n:      .long 3       # Count of students
+n:      .long 4       # Count of students
 m:      .long 0       # put the answer here
 s:      .long base    # address of the array
 base:   .long 1234    # student 0 ID
