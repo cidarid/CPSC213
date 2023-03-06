@@ -110,7 +110,8 @@ mov r0, r1
 shl $3, r0
 shl $4, r1
 add r0, r1
-ld $base, r0
+ld $s, r0
+ld (r0), r0
 add r0, r1
 ld (r1), r1
 ld $m, r0
