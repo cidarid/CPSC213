@@ -21,7 +21,7 @@
 .pos 0x300
     ld   $-12, r0        # -12 => r0
     add  r0, r5          # Decrement address at r5 by 12 bytes (now 8 bytes behind &sb)
-    st   r6, 8(r5)       # Get value of sb and store it into r6
+    st   r6, 8(r5)       # Store jump point in sb
     ld   $1, r0          # Load 1 into r0
     st   r0, (r5)        # Store 1 into the memory address 8 bytes behind &sb
     ld   $2, r0          # 
@@ -40,9 +40,9 @@
     ld   4(r5), r2       # value of (r5+4) into r1
     ld   $-8, r0         # 
     add  r0, r5          # r5 -= 8
-    st   r1, (r5)        # value of r5 into r1
-    st   r2, 4(r5)       # value of (r5+4) into r1
-    gpc  $6, r6          # get adress of ld $8, r0 instruction
+    st   r1, (r5)        # store r1 into r5
+    st   r2, 4(r5)       # store r2 into *(r5 + 4)
+    gpc  $6, r6          # get address of ld $8, r0 instruction
     j    0x200           #
     ld   $8, r0          #
     add  r0, r5          # r5 += 8 (should be address of sb)
