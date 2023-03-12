@@ -1,21 +1,21 @@
 .pos 0x0
-    ld   $sb, r5         # Address of sb into r5
-    inca r5              # Increment address at r5 by 4 bytes
+    ld   $sb, r5         # Stack bounds into r5
+    inca r5              # Increment stack bounds by 4 bytes
     gpc  $6, r6          # Gets the address of the halt command two lines from now
-    j    0x300           #
-    halt                 #
+    j    0x300           # Jumps to helper function stack alloc
+    halt                 # Stops program
 
 .pos 0x100
-    .long 0x00001000     #
+    .long 0x00001000     # Pointer to array
 
 .pos 0x200
     ld   (r5), r0        # 3 => r0
     ld   4(r5), r1       # 4 => r1
-    ld   $0x100, r2      # 
-    ld   (r2), r2        # Get value at 0x100 (0x1000), store into r2
-    ld   (r2, r1, 4), r3 # Get value of address 0x1000 + 16 (0x1010), store into r3 
-    add  r3, r0          # r0 += 0
-    st   r0, (r2, r1, 4) # r0 => 0x1000 + 16 (1010)
+    ld   $0x100, r2      # Load arr
+    ld   (r2), r2        # Load *arr
+    ld   (r2, r1, 4), r3 # Get arr[r1], load into r3 
+    add  r3, r0          # r0 += r3
+    st   r0, (r2, r1, 4) # Stores r0 into *(arr + r1)
     j    (r6)            # jump to 0x33a (ld $0x8, r0 instruction 18 lines after this)
 
 .pos 0x300
