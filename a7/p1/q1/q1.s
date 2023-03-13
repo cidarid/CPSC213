@@ -1,5 +1,5 @@
 .pos 0x0
-    ld   $sb, r5         # Stack bounds into r5
+    ld   $sb, r5         # Load stack bounds into r5
     inca r5              # Increment stack bounds by 4 bytes
     gpc  $6, r6          # Gets the address of the halt command two lines from now
     j    0x300           # Jumps to helper function stack alloc
@@ -11,12 +11,12 @@
 .pos 0x200
     ld   (r5), r0        # 3 => r0
     ld   4(r5), r1       # 4 => r1
-    ld   $0x100, r2      # Load arr
-    ld   (r2), r2        # Load *arr
+    ld   $0x100, r2      # Load &arr
+    ld   (r2), r2        # Load arr
     ld   (r2, r1, 4), r3 # Get arr[r1], load into r3 
     add  r3, r0          # r0 += r3
     st   r0, (r2, r1, 4) # Stores r0 into *(arr + r1)
-    j    (r6)            # jump to 0x33a (ld $0x8, r0 instruction 18 lines after this)
+    j    (r6)            # Return to instruction after jump point in 0x300
 
 .pos 0x300
     ld   $-12, r0        # -12 => r0
