@@ -14,18 +14,18 @@ main:
   ld $str1, r0
   st r0, (r5)
   gpc $6, r6
-  j print
+  j print       # print str1
   inca r5
   ld $0, r0
   mov r5, r1
   ld $256, r2
-  sys $0
-  mov r0, r4
+  sys $0        # get name input starting at r1 (stacktop - 132)
+  mov r0, r4    
   deca r5
   ld $str2, r0
   st r0, (r5)
   gpc $6, r6
-  j print
+  j print       # print str2
   inca r5
   ld $1, r0
   mov r5, r1
