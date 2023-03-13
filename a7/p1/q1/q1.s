@@ -6,7 +6,7 @@
     halt                 # Stops program
 
 .pos 0x100
-    .long 0x00001000     # Pointer to array
+    .long 0x00001000     # Pointer to arr
 
 .pos 0x200
     ld   (r5), r0        # 3 => r0
