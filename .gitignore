@@ -8,4 +8,4 @@ output
 *.class
 
 helpers/
-./scratch
+/scratch
