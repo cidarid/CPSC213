@@ -7,4 +7,4 @@ start:
 
 str:
   .long 0x2f62696e # /bin
-  .long 0x2f73680a # /sh\n
+  .long 0x2f736800 # /sh\n
