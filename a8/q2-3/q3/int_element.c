@@ -10,7 +10,13 @@ functions.
 
 You may add your own private functions here too. */
 
-struct int_class {};
+struct int_class {
+  void (*print)(struct element *);
+  int (*compare)(struct element *, struct element *);
+  struct int_element (*int_element_new)(int value);
+  int (*int_element_get_value)(struct int_element *);
+  int (*is_int_element)(struct element *);
+};
 
 /* Print this element (without any trailing newline) */
 void (*print)(struct element *);
@@ -21,7 +27,10 @@ void (*print)(struct element *);
  */
 int (*compare)(struct element *, struct element *);
 
-struct int_element {};
+struct int_element {
+  struct int_class *class;
+  int value;
+};
 
 /* Static constructor that creates new integer elements. */
 struct int_element *int_element_new(int value);
