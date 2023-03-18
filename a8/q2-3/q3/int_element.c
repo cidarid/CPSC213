@@ -11,9 +11,9 @@ functions.
 You may add your own private functions here too. */
 
 struct int_class {
-  struct int_element *(*int_element_new)(int value);
   void (*print)(struct element *);
   int (*compare)(struct element *, struct element *);
+  struct int_element *(*int_element_new)(int value);
   int (*int_element_get_value)(struct int_element *);
   int (*is_int_element)(struct element *);
 };
@@ -29,6 +29,7 @@ struct int_element *int_element_new(int value) {
   struct int_element *this = malloc(sizeof(*this));
   this->class = &int_class_table;
   this->value = value;
+  // printf("%p\n", this->class->print);
   return this;
 }
 
@@ -55,5 +56,5 @@ int is_int_element(struct element *element) {
 }
 
 struct int_class int_class_table = {
-    int_element_new, print, compare, int_element_get_value, is_int_element,
+    print, compare, int_element_new, int_element_get_value, is_int_element,
 };

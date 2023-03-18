@@ -39,7 +39,7 @@ void test_int() {
   /* Basic test of int_element */
   struct element *e = (struct element *)int_element_new(42);
   e->class->print(e);
-  // printf("\n");
+  printf("\n");
   // rc_free_ref(e);
 }
 
