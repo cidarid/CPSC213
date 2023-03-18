@@ -29,7 +29,6 @@ struct int_element *int_element_new(int value) {
   struct int_element *this = malloc(sizeof(*this));
   this->class = &int_class_table;
   this->value = value;
-  // printf("%p\n", this->class->print);
   return this;
 }
 
