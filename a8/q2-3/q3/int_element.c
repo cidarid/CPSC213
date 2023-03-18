@@ -43,15 +43,22 @@ void print(struct element *element) {
  * number > 0 otherwise.
  */
 int compare(struct element *a, struct element *b) {
-  return 0;
+  if (is_int_element(a)) {
+    if (!is_int_element(b)) return -1;
+    int a_val = ((struct int_element *)a)->value;
+    int b_val = ((struct int_element *)b)->value;
+    return a_val - b_val;
+  }
+  if (is_int_element(b)) return 1;
+  // both are strings
 }
 /* Static function that obtains the value held in an int_element. */
 int int_element_get_value(struct int_element *int_element) {
-  return 0;
+  return int_element->value;
 }
 /* Static function that determines whether this is an int_element. */
 int is_int_element(struct element *element) {
-  return 0;
+  return element->class == &int_class_table ? 1 : 0;
 }
 
 struct int_class int_class_table = {
