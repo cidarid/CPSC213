@@ -7,7 +7,10 @@ SORT_OBJ = sortmain.o str_element.o int_element.o ../refcount.o
 EXES = $(MAIN_EXE) $(SORT_EXE)
 OBJS = $(MAIN_OBJ) $(SORT_OBJ)
 
+all: CXXFLAGS += -DDEBUG -g
+all: CCFLAGS += -DDEBUG -g
 all: $(EXES)
+
 
 $(MAIN_EXE): $(MAIN_OBJ)
 $(SORT_EXE): $(SORT_OBJ)
