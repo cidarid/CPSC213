@@ -55,7 +55,6 @@ void test_str() {
 
 int main(int argc, char **argv) {
   test_int();
-
   test_str();
   /*
     struct tree *t = tree_new();

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "refcount.h"
 
@@ -16,6 +17,11 @@ struct int_class {
   struct int_element *(*int_element_new)(int value);
   int (*int_element_get_value)(struct int_element *);
   int (*is_int_element)(struct element *);
+};
+
+struct str_element {
+  struct str_class *class;
+  char *value;
 };
 
 struct int_element {
@@ -43,15 +49,17 @@ void int_print(struct element *element) {
  * number > 0 otherwise.
  */
 int int_compare(struct element *a, struct element *b) {
-  return 0;
-  /*if (is_int_element(a)) {
+  if (is_int_element(a)) {
     if (!is_int_element(b)) return -1;
     int a_val = ((struct int_element *)a)->value;
     int b_val = ((struct int_element *)b)->value;
     return a_val - b_val;
   }
   if (is_int_element(b)) return 1;
-  // both are strings*/
+  // both are strings
+  char *a_val = ((struct str_element *)a)->value;
+  char *b_val = ((struct str_element *)b)->value;
+  return strcmp(a_val, b_val);
 }
 /* Static function that obtains the value held in an int_element. */
 int int_element_get_value(struct int_element *int_element) {

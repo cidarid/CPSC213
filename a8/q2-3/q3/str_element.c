@@ -22,6 +22,11 @@ struct str_element {
   char *value;
 };
 
+struct int_element {
+  struct int_class *class;
+  int value;
+};
+
 struct str_class str_class_table;
 
 /* Print this element (without any trailing newline) */
@@ -35,15 +40,19 @@ void str_print(struct element *element) {
  * number > 0 otherwise.
  */
 int str_compare(struct element *a, struct element *b) {
-  return 0;
-  /*if (is_int_element(a)) {
-    if (!is_int_element(b)) return -1;
-    int a_val = ((struct int_element *)a)->value;
-    int b_val = ((struct int_element *)b)->value;
-    return a_val - b_val;
+  if (is_str_element(a)) {
+    if (is_str_element(b)) {
+      char *a_val = ((struct str_element *)a)->value;
+      char *b_val = ((struct str_element *)b)->value;
+      return strcmp(a_val, b_val);
+    }
+    return 1;
   }
-  if (is_int_element(b)) return 1;
-  // both are strings*/
+  if (is_str_element(b)) return -1;
+  int a_val = ((struct int_element *)a)->value;
+  int b_val = ((struct int_element *)b)->value;
+  return a_val - b_val;
+  // both are strings
 }
 
 struct str_element *str_element_new(char *value) {
