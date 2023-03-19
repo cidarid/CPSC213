@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "refcount.h"
+
 /* TODO: Implement all public str_element functions, including element interface
 functions.
 
@@ -55,8 +57,13 @@ int str_compare(struct element *a, struct element *b) {
   // both are strings
 }
 
+void str_finalizer(void *p) {
+  struct str_element *element = (struct str_element *)p;
+  free(element->value);
+}
+
 struct str_element *str_element_new(char *value) {
-  struct str_element *this = malloc(sizeof(*this));
+  struct str_element *this = rc_malloc(sizeof(*this), str_finalizer);
   this->class = &str_class_table;
   char *copied_value = malloc(sizeof(value));
   this->value = strcpy(copied_value, value);

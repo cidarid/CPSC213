@@ -30,9 +30,14 @@ struct int_element {
 };
 
 struct int_class int_class_table;
+
+void int_finalizer(void *p) {
+  return;
+}
+
 /* Static constructor that creates new integer elements. */
 struct int_element *int_element_new(int value) {
-  struct int_element *this = malloc(sizeof(*this));
+  struct int_element *this = rc_malloc(sizeof(*this), int_finalizer);
   this->class = &int_class_table;
   this->value = value;
   return this;
