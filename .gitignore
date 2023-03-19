@@ -3,6 +3,7 @@
 .vscode
 .idea
 output
+*.o
 
 *.dSYM
 *.class
