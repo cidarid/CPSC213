@@ -43,65 +43,65 @@ void test_int() {
   rc_free_ref(e);
 }
 
-// void test_str() {
-//   /* Basic test of str_element */
-//   char *s = strdup("Hello, World!");
-//   struct element *e = (struct element *)str_element_new(s);
-//   free(s);
-//   e->class->print(e);
-//   printf("\n");
-//   rc_free_ref(e);
-// }
+void test_str() {
+  /* Basic test of str_element */
+  char *s = strdup("Hello, World!");
+  struct element *e = (struct element *)str_element_new(s);
+  free(s);
+  e->class->print(e);
+  printf("\n");
+  rc_free_ref(e);
+}
 
 int main(int argc, char **argv) {
   test_int();
-  /*
+
   test_str();
+  /*
+    struct tree *t = tree_new();
+    struct list *l = list_new();
 
-  struct tree *t = tree_new();
-  struct list *l = list_new();
-
-  // Parse input arguments
-  for (int i = 0; i < argc - 1; i++) {
-    struct element *e = parse_string(argv[i + 1]);
-    list_add_element(l, e);
-    rc_free_ref(e);
-  }
-
-  // Put some of the elements on the tree
-  for (struct list_node *n = list_get_head(l); n != NULL;
-       n = list_node_get_next(n)) {
-    if (includeElement()) tree_insert_node(t, list_node_get_element(n));
-  }
-  printf("Tree:\n");
-  tree_ordered_print(t);
-
-  // Print out only the integers
-  printf("List ints:");
-  for (struct list_node *n = list_get_head(l); n != NULL;
-       n = list_node_get_next(n)) {
-    struct element *e = list_node_get_element(n);
-    if (is_int_element(e)) {
-      printf(" %d", int_element_get_value((struct int_element *)e));
+    // Parse input arguments
+    for (int i = 0; i < argc - 1; i++) {
+      struct element *e = parse_string(argv[i + 1]);
+      list_add_element(l, e);
+      rc_free_ref(e);
     }
-  }
-  printf("\n");
 
-  // Print out only the strings
-  printf("List strings:");
-  for (struct list_node *n = list_get_head(l); n != NULL;
-       n = list_node_get_next(n)) {
-    struct element *e = list_node_get_element(n);
-    if (is_str_element(e)) {
-      printf(" %s", str_element_get_value((struct str_element *)e));
+    // Put some of the elements on the tree
+    for (struct list_node *n = list_get_head(l); n != NULL;
+         n = list_node_get_next(n)) {
+      if (includeElement()) tree_insert_node(t, list_node_get_element(n));
     }
-  }
-  printf("\n");
+    printf("Tree:\n");
+    tree_ordered_print(t);
 
-  list_delete(l);
+    // Print out only the integers
+    printf("List ints:");
+    for (struct list_node *n = list_get_head(l); n != NULL;
+         n = list_node_get_next(n)) {
+      struct element *e = list_node_get_element(n);
+      if (is_int_element(e)) {
+        printf(" %d", int_element_get_value((struct int_element *)e));
+      }
+    }
+    printf("\n");
 
-  printf("Tree after deleting list:\n");
-  tree_ordered_print(t);
-  tree_delete(t);
-  */
+    // Print out only the strings
+    printf("List strings:");
+    for (struct list_node *n = list_get_head(l); n != NULL;
+         n = list_node_get_next(n)) {
+      struct element *e = list_node_get_element(n);
+      if (is_str_element(e)) {
+        printf(" %s", str_element_get_value((struct str_element *)e));
+      }
+    }
+    printf("\n");
+
+    list_delete(l);
+
+    printf("Tree after deleting list:\n");
+    tree_ordered_print(t);
+    tree_delete(t);
+    */
 }

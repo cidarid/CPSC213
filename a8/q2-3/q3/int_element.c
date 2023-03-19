@@ -33,7 +33,7 @@ struct int_element *int_element_new(int value) {
 }
 
 /* Print this element (without any trailing newline) */
-void print(struct element *element) {
+void int_print(struct element *element) {
   struct int_element *real = (struct int_element *)element;
   printf("%d", real->value);
 }
@@ -42,15 +42,16 @@ void print(struct element *element) {
  * element is less than the second element, 0 if the elements compare equal, a
  * number > 0 otherwise.
  */
-int compare(struct element *a, struct element *b) {
-  if (is_int_element(a)) {
+int int_compare(struct element *a, struct element *b) {
+  return 0;
+  /*if (is_int_element(a)) {
     if (!is_int_element(b)) return -1;
     int a_val = ((struct int_element *)a)->value;
     int b_val = ((struct int_element *)b)->value;
     return a_val - b_val;
   }
   if (is_int_element(b)) return 1;
-  // both are strings
+  // both are strings*/
 }
 /* Static function that obtains the value held in an int_element. */
 int int_element_get_value(struct int_element *int_element) {
@@ -58,9 +59,10 @@ int int_element_get_value(struct int_element *int_element) {
 }
 /* Static function that determines whether this is an int_element. */
 int is_int_element(struct element *element) {
-  return element->class == &int_class_table ? 1 : 0;
+  return element->class == (struct element_class *)&int_class_table ? 1 : 0;
 }
 
 struct int_class int_class_table = {
-    print, compare, int_element_new, int_element_get_value, is_int_element,
+    int_print,      int_compare, int_element_new, int_element_get_value,
+    is_int_element,
 };
