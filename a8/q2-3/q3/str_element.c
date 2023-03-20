@@ -65,8 +65,8 @@ void str_finalizer(void *p) {
 struct str_element *str_element_new(char *value) {
   struct str_element *this = rc_malloc(sizeof(*this), str_finalizer);
   this->class = &str_class_table;
-  char *copied_value = malloc(sizeof(value));
-  this->value = strcpy(copied_value, value);
+  this->value = malloc(strlen(value) + 1);
+  strcpy(this->value, value);
   return this;
 }
 

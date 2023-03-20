@@ -28,6 +28,13 @@ int compare(const void *_a, const void *_b) {
   return (*a)->class->compare(*a, *b);
 }
 
+void finalizer(void *item) {
+  struct element **elements = item;
+  for (int i = 0; i < sizeof(elements) / sizeof(struct element *); i++) {
+    free(elements[i]);
+  }
+}
+
 int main(int argc, char **argv) {
   struct element **elements =
       rc_malloc(sizeof(struct element *) * (argc - 1), 0);
@@ -42,4 +49,5 @@ int main(int argc, char **argv) {
     printf(" ");
   }
   printf("\n");
+  rc_free_ref(elements);
 }
