@@ -20,15 +20,10 @@ void fetch() {
   insOp2 = mem[pc + 1] & 0xf;
   insOpImm = mem[pc + 1];
   pc += 2;
-  switch (insOpCode) {
-    case 0x0:
-    case 0xb:
-      insOpExt =
-          mem[pc] << 24 | mem[pc + 1] << 16 | mem[pc + 2] << 8 | mem[pc + 3];
-      pc += 4;
-      break;
-    default:;
-  }
+  if (insOpCode != 0x0 && insOpCode != 0xb) goto DEFAULT;
+  insOpExt = mem[pc] << 24 | mem[pc + 1] << 16 | mem[pc + 2] << 8 | mem[pc + 3];
+  pc += 4;
+DEFAULT:;
 }
 
 int exec() {
