@@ -1,9 +1,9 @@
+*.o
 
 .DS_Store
 .vscode
 .idea
 output
-*.o
 
 *.dSYM
 *.class
