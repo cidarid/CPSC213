@@ -29,120 +29,129 @@ DEFAULT:;
 int exec() {
   int cont = 1;
   int addr, val;
-  switch (insOpCode) {
-    case 0x0:  // ld $i, d .............. 0d-- iiii iiii
-      reg[insOp0] = insOpExt;
+
+  void* jt[16] = {&&L0, &&L1, &&L2, &&L3, &&L4, 0, &&L6, &&L7,
+                  &&L8, &&L9, &&La, &&Lb, &&Lc, 0, 0,    &&Lf};
+  if (insOpCode < 0x0 || insOpCode > 0xf || insOpCode == 0x5 ||
+      insOpCode == 0xd || insOpCode == 0xe)
+    goto DEFAULT;
+  else
+    goto* jt[insOpCode];
+
+L0:  // 0x0, ld $i, d .............. 0d-- iiii iiii
+  reg[insOp0] = insOpExt;
+  goto CONTINUE;
+L1:  // 0x1, ld o(rs), rd .......... 1osd
+  addr = (insOp0 << 2) + reg[insOp1];
+  reg[insOp2] = mem[addr] << 24 | mem[addr + 1] << 16 | mem[addr + 2] << 8 |
+                mem[addr + 3];
+  goto CONTINUE;
+L2:  // ld (rs, ri, 2), rd .... 2sid
+  addr = reg[insOp0] + (reg[insOp1] << 2);
+  reg[insOp2] = mem[addr] << 24 | mem[addr + 1] << 16 | mem[addr + 2] << 8 |
+                mem[addr + 3];
+  goto CONTINUE;
+L3:  // 0x3, st rs, o(rd) .......... 3sod
+  addr = (insOp1 << 2) + reg[insOp2];
+  val = reg[insOp0];
+  mem[addr] = val >> 24 & 0xff;
+  mem[addr + 1] = val >> 16 & 0xff;
+  mem[addr + 2] = val >> 8 & 0xff;
+  mem[addr + 3] = val & 0xff;
+  goto CONTINUE;
+L4:  // st rs, (rd, ri, 4) .... 4sdi
+  addr = reg[insOp1] + (reg[insOp2] << 2);
+  val = reg[insOp0];
+  mem[addr] = val >> 24 & 0xff;
+  mem[addr + 1] = val >> 16 & 0xff;
+  mem[addr + 2] = val >> 8 & 0xff;
+  mem[addr + 3] = val & 0xff;
+  goto CONTINUE;
+L6:  // 0x6, ALU ................... 6-sd
+  switch (insOp0) {
+    case 0x0:  // mov rs, rd ........ 60sd
+      reg[insOp2] = reg[insOp1];
       break;
-    case 0x1:  // ld o(rs), rd .......... 1osd
-      addr = (insOp0 << 2) + reg[insOp1];
-      reg[insOp2] = mem[addr] << 24 | mem[addr + 1] << 16 | mem[addr + 2] << 8 |
-                    mem[addr + 3];
+    case 0x1:  // add rs, rd ........ 61sd
+      reg[insOp2] = reg[insOp1] + reg[insOp2];
       break;
-    case 0x2:  // ld (rs, ri, 2), rd .... 2sid
-      addr = reg[insOp0] + (reg[insOp1] << 2);
-      reg[insOp2] = mem[addr] << 24 | mem[addr + 1] << 16 | mem[addr + 2] << 8 |
-                    mem[addr + 3];
+    case 0x2:  // and rs, rd ........ 62sd
+      reg[insOp2] = reg[insOp1] & reg[insOp2];
       break;
-    case 0x3:  // st rs, o(rd) .......... 3sod
-      addr = (insOp1 << 2) + reg[insOp2];
-      val = reg[insOp0];
-      mem[addr] = val >> 24 & 0xff;
-      mem[addr + 1] = val >> 16 & 0xff;
-      mem[addr + 2] = val >> 8 & 0xff;
-      mem[addr + 3] = val & 0xff;
+    case 0x3:  // inc rr ............ 63-r
+      reg[insOp2] = reg[insOp2] + 1;
       break;
-    case 0x4:  // st rs, (rd, ri, 4) .... 4sdi
-      addr = reg[insOp1] + (reg[insOp2] << 2);
-      val = reg[insOp0];
-      mem[addr] = val >> 24 & 0xff;
-      mem[addr + 1] = val >> 16 & 0xff;
-      mem[addr + 2] = val >> 8 & 0xff;
-      mem[addr + 3] = val & 0xff;
+    case 0x4:  // inca rr ........... 64-r
+      reg[insOp2] = reg[insOp2] + 4;
       break;
-    case 0x6:  // ALU ................... 6-sd
-      switch (insOp0) {
-        case 0x0:  // mov rs, rd ........ 60sd
-          reg[insOp2] = reg[insOp1];
-          break;
-        case 0x1:  // add rs, rd ........ 61sd
-          reg[insOp2] = reg[insOp1] + reg[insOp2];
-          break;
-        case 0x2:  // and rs, rd ........ 62sd
-          reg[insOp2] = reg[insOp1] & reg[insOp2];
-          break;
-        case 0x3:  // inc rr ............ 63-r
-          reg[insOp2] = reg[insOp2] + 1;
-          break;
-        case 0x4:  // inca rr ........... 64-r
-          reg[insOp2] = reg[insOp2] + 4;
-          break;
-        case 0x5:  // dec rr ............ 65-r
-          reg[insOp2] = reg[insOp2] - 1;
-          break;
-        case 0x6:  // deca rr ........... 66-r
-          reg[insOp2] = reg[insOp2] - 4;
-          break;
-        case 0x7:  // not ............... 67-r
-          reg[insOp2] = ~reg[insOp2];
-          break;
-        case 0xf:  // gpc ............... 6f-r
-          reg[insOp2] = pc + (insOp1 << 1);
-          break;
-        default:
-          printf("Illegal ALU instruction: pc=0x%x fun=0x%x\n", pc, insOp0);
-      }
+    case 0x5:  // dec rr ............ 65-r
+      reg[insOp2] = reg[insOp2] - 1;
       break;
-    case 0x7:  // sh? $i,rd ............. 7dii
-      if (insOpImm > 0)
-        reg[insOp0] = reg[insOp0] << insOpImm;
-      else
-        reg[insOp0] = reg[insOp0] >> -insOpImm;
+    case 0x6:  // deca rr ........... 66-r
+      reg[insOp2] = reg[insOp2] - 4;
       break;
-    case 0x8:  // br o .................. 8-oo
-      pc += insOpImm << 1;
+    case 0x7:  // not ............... 67-r
+      reg[insOp2] = ~reg[insOp2];
       break;
-    case 0x9:  // beq rs, o ............. 9roo
-      if (reg[insOp0] == 0) pc += insOpImm << 1;
-      break;
-    case 0xa:  // bgt rs, o .............. aroo
-      if (reg[insOp0] > 0) pc += insOpImm << 1;
-      break;
-    case 0xb:  // j i ................... b--- iiii iiii
-      pc = insOpExt;
-      break;
-    case 0xc:  // j o(rr) ............... croo
-      pc = (((unsigned short)insOpImm) << 1) + reg[insOp0];
-      break;
-    case 0xf:  // halt or nop ............. f?--
-      if (insOp0 == 0)
-        cont = 0;
-      else if (insOp0 == 1) {
-        // sys i                           f1ii
-        if (insOpImm == 0) {
-          // sys read
-          reg[0] = read(reg[0], &mem[reg[1]], reg[2]);
-        } else if (insOpImm == 1) {
-          // sys write
-          reg[0] = write(reg[0], &mem[reg[1]], reg[2]);
-        } else if (insOpImm == 2) {
-          // sys exec
-          char* unsafe = getenv("SIMPLE_MACHINE_ALLOW_EXEC");
-          if (unsafe && strcmp(unsafe, "1") == 0) {
-            int size = reg[1];
-            char* str = malloc(size + 1);
-            memcpy(str, &mem[reg[0]], size);
-            str[size] = 0;
-            reg[0] = system(str);
-            free(str);
-          } else {
-            printf("<<<WOULD EXECUTE %.*s>>>\n", reg[1], &mem[reg[0]]);
-          }
-        }
-      }
+    case 0xf:  // gpc ............... 6f-r
+      reg[insOp2] = pc + (insOp1 << 1);
       break;
     default:
-      printf("Illegal  instruction: pc=0x%x opCode=0x%x\n", pc, insOpCode);
+      printf("Illegal ALU instruction: pc=0x%x fun=0x%x\n", pc, insOp0);
   }
+  goto CONTINUE;
+L7:  // sh? $i,rd ............. 7dii
+  if (insOpImm > 0)
+    reg[insOp0] = reg[insOp0] << insOpImm;
+  else
+    reg[insOp0] = reg[insOp0] >> -insOpImm;
+  goto CONTINUE;
+L8:  // br o .................. 8-oo
+  pc += insOpImm << 1;
+  goto CONTINUE;
+L9:  // beq rs, o ............. 9roo
+  if (reg[insOp0] == 0) pc += insOpImm << 1;
+  goto CONTINUE;
+La:  // bgt rs, o .............. aroo
+  if (reg[insOp0] > 0) pc += insOpImm << 1;
+  goto CONTINUE;
+Lb:  // j i ................... b--- iiii iiii
+  pc = insOpExt;
+  goto CONTINUE;
+Lc:  // j o(rr) ............... croo
+  pc = (((unsigned short)insOpImm) << 1) + reg[insOp0];
+  goto CONTINUE;
+Lf:  // halt or nop ............. f?--
+  if (insOp0 == 0)
+    cont = 0;
+  else if (insOp0 == 1) {
+    // sys i                           f1ii
+    if (insOpImm == 0) {
+      // sys read
+      reg[0] = read(reg[0], &mem[reg[1]], reg[2]);
+    } else if (insOpImm == 1) {
+      // sys write
+      reg[0] = write(reg[0], &mem[reg[1]], reg[2]);
+    } else if (insOpImm == 2) {
+      // sys exec
+      char* unsafe = getenv("SIMPLE_MACHINE_ALLOW_EXEC");
+      if (unsafe && strcmp(unsafe, "1") == 0) {
+        int size = reg[1];
+        char* str = malloc(size + 1);
+        memcpy(str, &mem[reg[0]], size);
+        str[size] = 0;
+        reg[0] = system(str);
+        free(str);
+      } else {
+        printf("<<<WOULD EXECUTE %.*s>>>\n", reg[1], &mem[reg[0]]);
+      }
+    }
+  }
+  goto CONTINUE;
+DEFAULT:
+  printf("Illegal  instruction: pc=0x%x opCode=0x%x\n", pc, insOpCode);
+  goto CONTINUE;
+CONTINUE:
   return cont;
 }
 
