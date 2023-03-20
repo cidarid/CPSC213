@@ -1,10 +1,11 @@
 CFLAGS += -std=gnu11 -g
-EXES = test
-OBJS = list.o test.o 
+EXES = test trunc
+OBJS = list.o test.o trunc.o
 
 all: $(EXES)
 
-test:   test.o list.o
+test:   test.o list.o 
+trunc: 	trunc.o list.o
 
 clean:
 	rm -f $(EXES) $(OBJS)
