@@ -29,7 +29,7 @@ DEFAULT:;
 int exec() {
   int cont = 1;
   int addr, val;
-
+  void* alu_jt[8] = {&&L60, &&L61, &&L62, &&L63, &&L64, &&L65, &&L66, &&L67};
   void* jt[16] = {&&L0, &&L1, &&L2, &&L3, &&L4, 0, &&L6, &&L7,
                   &&L8, &&L9, &&La, &&Lb, &&Lc, 0, 0,    &&Lf};
   if (insOpCode < 0x0 || insOpCode > 0xf || insOpCode == 0x5 ||
@@ -68,37 +68,40 @@ L4:  // st rs, (rd, ri, 4) .... 4sdi
   mem[addr + 3] = val & 0xff;
   goto CONTINUE;
 L6:  // 0x6, ALU ................... 6-sd
-  switch (insOp0) {
-    case 0x0:  // mov rs, rd ........ 60sd
-      reg[insOp2] = reg[insOp1];
-      break;
-    case 0x1:  // add rs, rd ........ 61sd
-      reg[insOp2] = reg[insOp1] + reg[insOp2];
-      break;
-    case 0x2:  // and rs, rd ........ 62sd
-      reg[insOp2] = reg[insOp1] & reg[insOp2];
-      break;
-    case 0x3:  // inc rr ............ 63-r
-      reg[insOp2] = reg[insOp2] + 1;
-      break;
-    case 0x4:  // inca rr ........... 64-r
-      reg[insOp2] = reg[insOp2] + 4;
-      break;
-    case 0x5:  // dec rr ............ 65-r
-      reg[insOp2] = reg[insOp2] - 1;
-      break;
-    case 0x6:  // deca rr ........... 66-r
-      reg[insOp2] = reg[insOp2] - 4;
-      break;
-    case 0x7:  // not ............... 67-r
-      reg[insOp2] = ~reg[insOp2];
-      break;
-    case 0xf:  // gpc ............... 6f-r
-      reg[insOp2] = pc + (insOp1 << 1);
-      break;
-    default:
-      printf("Illegal ALU instruction: pc=0x%x fun=0x%x\n", pc, insOp0);
-  }
+  if (insOp0 == 0xf) goto L6f;
+  if (insOp0 < 0 || insOp0 > 0x7) goto ALU_DEFAULT;
+  goto* alu_jt[insOp0];
+L60:  // mov rs, rd ........ 60sd
+  reg[insOp2] = reg[insOp1];
+  goto ALU_CONTINUE;
+L61:  // add rs, rd ........ 61sd
+  reg[insOp2] = reg[insOp1] + reg[insOp2];
+  goto ALU_CONTINUE;
+L62:  // and rs, rd ........ 62sd
+  reg[insOp2] = reg[insOp1] & reg[insOp2];
+  goto ALU_CONTINUE;
+L63:  // inc rr ............ 63-r
+  reg[insOp2] = reg[insOp2] + 1;
+  goto ALU_CONTINUE;
+L64:  // inca rr ........... 64-r
+  reg[insOp2] = reg[insOp2] + 4;
+  goto ALU_CONTINUE;
+L65:  // dec rr ............ 65-r
+  reg[insOp2] = reg[insOp2] - 1;
+  goto ALU_CONTINUE;
+L66:  // deca rr ........... 66-r
+  reg[insOp2] = reg[insOp2] - 4;
+  goto ALU_CONTINUE;
+L67:  // not ............... 67-r
+  reg[insOp2] = ~reg[insOp2];
+  goto ALU_CONTINUE;
+L6f:  // gpc ............... 6f-r
+  reg[insOp2] = pc + (insOp1 << 1);
+  goto ALU_CONTINUE;
+ALU_DEFAULT:
+  printf("Illegal ALU instruction: pc=0x%x fun=0x%x\n", pc, insOp0);
+  goto ALU_CONTINUE;
+ALU_CONTINUE:
   goto CONTINUE;
 L7:  // sh? $i,rd ............. 7dii
   if (insOpImm > 0)
