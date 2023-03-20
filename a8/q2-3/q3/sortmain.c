@@ -31,7 +31,7 @@ int compare(const void *_a, const void *_b) {
 void finalizer(void *item) {
   struct element **elements = item;
   for (int i = 0; i < sizeof(elements) / sizeof(struct element *); i++) {
-    free(elements[i]);
+    rc_free_ref(elements[i]);
   }
 }
 
@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
   printf("Sorted: ");
   for (int i = 0; i < argc - 1; i++) {
     elements[i]->class->print(elements[i]);
+    rc_free_ref(elements[i]);
     printf(" ");
   }
   printf("\n");
