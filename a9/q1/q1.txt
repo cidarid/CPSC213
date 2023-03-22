@@ -15,3 +15,5 @@ Observations:
 
 The time to run the synchronous read seems to take about the num_blocks * 0.01 seconds.
 So each read takes about 0.01 seconds to elapse, give or take some fluctuation whithin the runtime.
+This is because the program waits for each read to finish before starting a new read, making the time to run the program related to the number of blocks to be read.
+This is shown on lines 43 and 44 of sRead.c, when the program loops until is_read_pending is false before continuing to loop over the block number.
