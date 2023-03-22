@@ -21,9 +21,7 @@ void interrupt_service_routine() {
 
 void handle_read(void *resultv, void *not_used) {
   sum += *(int *)resultv;
-  printf("handle_read - sum: %d", sum);
   pending_reads--;
-  printf("handle_read - pending_reads: %d", pending_reads);
 }
 
 int main(int argc, char **argv) {
@@ -47,7 +45,7 @@ int main(int argc, char **argv) {
 
   // Trigger reads and sum blocks
   for (int i = 0; i < num_blocks; i++) {
-    int *res = 0;
+    int *res;
     queue_enqueue(pending_read_queue, res, NULL, handle_read);
     disk_schedule_read(res, i);
   }
