@@ -21,7 +21,9 @@ void interrupt_service_routine() {
 
 void handle_read(void *resultv, void *not_used) {
   sum += *(int *)resultv;
+  printf("handle_read - sum: %d", sum);
   pending_reads--;
+  printf("handle_read - pending_reads: %d", pending_reads);
 }
 
 int main(int argc, char **argv) {
