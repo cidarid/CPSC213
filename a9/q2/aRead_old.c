@@ -44,15 +44,16 @@ int main(int argc, char **argv) {
   pending_reads = num_blocks;
 
   // Trigger reads and sum blocks
-  int *res = malloc(sizeof(int) * num_blocks);
   for (int i = 0; i < num_blocks; i++) {
-    queue_enqueue(pending_read_queue, &res[i], NULL, handle_read);
-    disk_schedule_read(&res[i], i);
+    int *res;
+    queue_enqueue(pending_read_queue, res, NULL, handle_read);
+    disk_schedule_read(res, i);
   }
 
   // polling loop so that main doesn't return before all of the reads complete
   while (pending_reads > 0)
     ;
+
   printf("%d\n", sum);
-  free(res);
 }
+

@@ -1,0 +1,29 @@
+sRead
+10 Blocks   - 0.11
+        0.11 real         0.09 user         0.00 sys
+100 Blocks  - 1.07
+        1.07 real         0.88 user         0.06 sys
+1000 Blocks - 10.69
+       10.69 real         9.79 user         0.35 sys
+
+aRead
+10 Blocks   - 0.018
+    0.01s user 0.00s system 71% cpu 0.018 total
+    0.01s user 0.00s system 75% cpu 0.020 total
+    0.01s user 0.00s system 73% cpu 0.020 total
+100 Blocks  - 0.018
+    0.01s user 0.00s system 74% cpu 0.019 total
+    0.01s user 0.00s system 74% cpu 0.018 total
+    0.01s user 0.01s system 66% cpu 0.027 total
+1000 Blocks - 0.022s
+    0.01s user 0.00s system 69% cpu 0.027 total
+    0.01s user 0.00s system 77% cpu 0.022 total
+    0.01s user 0.00s system 76% cpu 0.022 total
+
+Observations:
+
+aRead is much, much faster than sRead for each respective block read.
+This is probably because aRead runs each of the block reads at the same time, regardless if the previous read has finished yet, so the entire program takes about the time of a single block read (for 1000 reads, 0.022s seconds).
+sRead, on the other hand, waits for the previous block to be read before reading the next block, until there are no more blocks left.
+It ends up taking about num_blocks multiplied by the time it takes to do a single disk read to run the program (for 1000 reads, 10.67 seconds).
+
