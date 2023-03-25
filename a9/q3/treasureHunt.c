@@ -23,7 +23,6 @@ void interrupt_service_routine() {
 
 void handleOtherReads(void *resultv, void *countv) {
   int block_val = *(int *)resultv;
-  // printf("Second block: %d\n", block_val);
   pending_reads--;
   waiting_for_prev_block = 0;
 }
@@ -31,8 +30,6 @@ void handleOtherReads(void *resultv, void *countv) {
 void handleFirstRead(void *resultv, void *countv) {
   first_block_val = *(int *)resultv;
   waiting_for_first_block = 0;
-  // printf("Waiting: %s\n", waiting_for_first_block ? "true" : "false");
-  // printf("First block: %d\n", first_block_val);
 }
 
 int main(int argc, char **argv) {
