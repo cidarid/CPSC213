@@ -11,7 +11,8 @@
 queue_t pending_read_queue;
 unsigned int first_block_val = 0;
 int waiting_for_first_block = 1;
-int still_running = 1;
+int waiting_for_prev_block = 1;
+volatile int pending_reads;
 
 void interrupt_service_routine() {
   void *val;
@@ -21,16 +22,17 @@ void interrupt_service_routine() {
 }
 
 void handleOtherReads(void *resultv, void *countv) {
-  int second_block_val = *(int *)resultv;
-  printf("Second block: %d\n", second_block_val);
-  still_running = 0;
+  int block_val = *(int *)resultv;
+  // printf("Second block: %d\n", block_val);
+  pending_reads--;
+  waiting_for_prev_block = 0;
 }
 
 void handleFirstRead(void *resultv, void *countv) {
   first_block_val = *(int *)resultv;
   waiting_for_first_block = 0;
-  printf("Waiting: %s\n", waiting_for_first_block ? "true" : "false");
-  printf("First block: %d\n", first_block_val);
+  // printf("Waiting: %s\n", waiting_for_first_block ? "true" : "false");
+  // printf("First block: %d\n", first_block_val);
 }
 
 int main(int argc, char **argv) {
@@ -57,13 +59,24 @@ int main(int argc, char **argv) {
 
   while (waiting_for_first_block)
     ;
-  int *second_block = malloc(sizeof(int));
-  queue_enqueue(pending_read_queue, second_block, NULL, handleOtherReads);
-  disk_schedule_read(second_block, first_block_val);
-  // TODO
-  while (still_running)
+  int *blocks = malloc(sizeof(int) * first_block_val);
+  queue_enqueue(pending_read_queue, &blocks[0], NULL, handleOtherReads);
+  disk_schedule_read(&blocks[0], first_block_val);
+  while (waiting_for_prev_block)
+    ;
+  pending_reads = first_block_val - 1;
+  for (int i = 1; i < first_block_val; i++) {
+    waiting_for_prev_block = 1;
+    queue_enqueue(pending_read_queue, &blocks[i], NULL, handleOtherReads);
+    disk_schedule_read(&blocks[i], blocks[i - 1]);
+    while (waiting_for_prev_block)
+      ;
+  }
+
+  while (pending_reads > 0)
     ;  // infinite loop so that main doesn't return
        // before hunt completes
-  printf("%d", *starting_block);
+  printf("%d", blocks[first_block_val - 1]);
   free(starting_block);
+  free(blocks);
 }
