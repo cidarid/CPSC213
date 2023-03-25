@@ -9,6 +9,7 @@
 #include "uthread.h"
 
 queue_t pending_read_queue;
+unsigned int first_block_val = 0;
 unsigned int val = 0;
 int still_running = 1;
 
@@ -24,12 +25,10 @@ void handleOtherReads(void *resultv, void *countv) {
 }
 
 void handleFirstRead(void *resultv, void *countv) {
-  printf("yeah");
-  val = *(int *)resultv;
+  first_block_val = *(int *)resultv;
   still_running = 0;
   printf("Your boolean variable is: %s\n", still_running ? "true" : "false");
-  printf("%d", val);
-  exit(0);
+  printf("%d", first_block_val);
 }
 
 int main(int argc, char **argv) {
