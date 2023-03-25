@@ -10,7 +10,7 @@
 
 queue_t pending_read_queue;
 unsigned int first_block_val = 0;
-unsigned int val = 0;
+int waiting_for_first_block = 1;
 int still_running = 1;
 
 void interrupt_service_routine() {
@@ -21,14 +21,16 @@ void interrupt_service_routine() {
 }
 
 void handleOtherReads(void *resultv, void *countv) {
-  // TODO
+  int second_block_val = *(int *)resultv;
+  printf("Second block: %d\n", second_block_val);
+  still_running = 0;
 }
 
 void handleFirstRead(void *resultv, void *countv) {
   first_block_val = *(int *)resultv;
-  still_running = 0;
-  printf("Your boolean variable is: %s\n", still_running ? "true" : "false");
-  printf("%d", first_block_val);
+  waiting_for_first_block = 0;
+  printf("Waiting: %s\n", waiting_for_first_block ? "true" : "false");
+  printf("First block: %d\n", first_block_val);
 }
 
 int main(int argc, char **argv) {
@@ -48,13 +50,20 @@ int main(int argc, char **argv) {
   pending_read_queue = queue_create();
 
   // Start the Hunt
+
   int *starting_block = malloc(sizeof(int));
   queue_enqueue(pending_read_queue, starting_block, NULL, handleFirstRead);
   disk_schedule_read(starting_block, starting_block_number);
 
+  while (waiting_for_first_block)
+    ;
+  int *second_block = malloc(sizeof(int));
+  queue_enqueue(pending_read_queue, second_block, NULL, handleOtherReads);
+  disk_schedule_read(second_block, first_block_val);
   // TODO
   while (still_running)
-    ;  // infinite loop so that main doesn't return before hunt completes
+    ;  // infinite loop so that main doesn't return
+       // before hunt completes
   printf("%d", *starting_block);
   free(starting_block);
 }
