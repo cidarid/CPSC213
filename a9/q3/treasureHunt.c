@@ -47,7 +47,6 @@ int main(int argc, char **argv) {
   uthread_init(1);
   disk_start(interrupt_service_routine);
   pending_read_queue = queue_create();
-  printf("awdsd");
 
   // Start the Hunt
   int *starting_block = malloc(sizeof(int));
