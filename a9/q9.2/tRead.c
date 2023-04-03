@@ -14,17 +14,12 @@ volatile int result;
 unsigned int sum = 0;
 int* vals;
 uthread_t* threads;
-uthread_t active;
 
 void interrupt_service_routine() {
   void* thread;
   void (*callback)(void*, void*);
   queue_dequeue(pending_read_queue, &thread, NULL, &callback);
   callback(thread, NULL);
-  /*void* val;
-  void (*callback)(void*, void*);
-  uthread_unblock() queue_dequeue(pending_read_queue, &val, NULL, &callback);
-  callback(val, NULL);*/
 }
 
 void* read_block(void* blocknov) {
@@ -61,7 +56,6 @@ int main(int argc, char** argv) {
 
   int val = 0;
   int val_2 = val + 1;
-  // active = uthread_create(read_block, &val);
   for (int i = 0; i < num_blocks; i++) {
     vals[i] = i;
     threads[i] = uthread_create(read_block, &vals[i]);
@@ -73,11 +67,4 @@ int main(int argc, char** argv) {
   printf("%d\n", sum);
   free(threads);
   free(vals);
-  /*uthread_t local = uthread_create(read_block, &val);
-  queue_enqueue(pending_read_queue, &local, NULL, unblock);
-  uthread_t local_2 = uthread_create(read_block, &val_2);
-  queue_enqueue(pending_read_queue, &local_2, NULL, unblock);
-  uthread_join(local, NULL);
-  uthread_join(local_2, NULL);*/
-  // TODO
 }
