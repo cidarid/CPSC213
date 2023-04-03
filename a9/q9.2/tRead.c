@@ -24,6 +24,7 @@ void interrupt_service_routine() {
 void* read_block(void* blocknov) {
   int blockno = *(int*)blocknov;
   disk_schedule_read(&vals[blockno], blockno);
+  queue_enqueue(pending_read_queue, uthread_self(), NULL, NULL);
   uthread_block();
   sum += vals[blockno];
   return NULL;
@@ -50,7 +51,6 @@ int main(int argc, char** argv) {
   for (int i = 0; i < num_blocks; i++) {
     vals[i] = i;
     threads[i] = uthread_create(read_block, &vals[i]);
-    queue_enqueue(pending_read_queue, &threads[i], NULL, NULL);
   }
   for (int i = 0; i < num_blocks; i++) {
     uthread_join(threads[i], NULL);
