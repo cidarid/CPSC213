@@ -17,23 +17,16 @@ uthread_t* threads;
 
 void interrupt_service_routine() {
   void* thread;
-  void (*callback)(void*, void*);
-  queue_dequeue(pending_read_queue, &thread, NULL, &callback);
-  callback(thread, NULL);
+  queue_dequeue(pending_read_queue, &thread, NULL, NULL);
+  uthread_unblock(*(uthread_t*)thread);
 }
 
 void* read_block(void* blocknov) {
-  uthread_t waiting_thread = uthread_self();
   int blockno = *(int*)blocknov;
   disk_schedule_read(&vals[blockno], blockno);
   uthread_block();
   sum += vals[blockno];
   return NULL;
-}
-
-void unblock(void* _thread, void* none) {
-  uthread_t* thread = _thread;
-  uthread_unblock(*thread);
 }
 
 int main(int argc, char** argv) {
@@ -54,12 +47,10 @@ int main(int argc, char** argv) {
   threads = malloc(sizeof(uthread_t) * num_blocks);
   vals = malloc(sizeof(int) * num_blocks);
 
-  int val = 0;
-  int val_2 = val + 1;
   for (int i = 0; i < num_blocks; i++) {
     vals[i] = i;
     threads[i] = uthread_create(read_block, &vals[i]);
-    queue_enqueue(pending_read_queue, &threads[i], NULL, unblock);
+    queue_enqueue(pending_read_queue, &threads[i], NULL, NULL);
   }
   for (int i = 0; i < num_blocks; i++) {
     uthread_join(threads[i], NULL);
