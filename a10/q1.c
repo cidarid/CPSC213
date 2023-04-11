@@ -1,4 +1,4 @@
-#include "uthreads/uthread.h"
+#include "uthread.h"
 #include <stdio.h>
 #include <stdlib.h>
 
