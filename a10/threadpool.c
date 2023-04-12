@@ -1,5 +1,6 @@
 #include "threadpool.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "uthread.h"
@@ -26,7 +27,13 @@ void *worker_thread(void *pool_v) {
  */
 tpool_t tpool_create(unsigned int max_threads) {
   uthread_t *threads = malloc(sizeof(uthread_t) * max_threads);
-  tpool_t pool = {max_threads, threads};
+  tpool_t pool = malloc(sizeof(tpool_t));
+  (*pool).num_threads = max_threads;
+  (*pool).threads = threads;
+  printf("Pool should have size of %d and pointer to %p\n", max_threads,
+         threads);
+  printf("Pool has size of %d and pointer to %p\n", (*pool).num_threads,
+         (*pool).threads);
   return pool;
 }
 
@@ -43,4 +50,8 @@ void tpool_schedule_task(tpool_t pool, void (*f)(tpool_t, void *), void *arg) {
  */
 void tpool_join(tpool_t pool) {
   // TODO
+}
+
+int main() {
+  tpool_create(30);
 }
