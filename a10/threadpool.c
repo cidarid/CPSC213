@@ -30,10 +30,6 @@ tpool_t tpool_create(unsigned int max_threads) {
   tpool_t pool = malloc(sizeof(tpool_t));
   (*pool).num_threads = max_threads;
   (*pool).threads = threads;
-  printf("Pool should have size of %d and pointer to %p\n", max_threads,
-         threads);
-  printf("Pool has size of %d and pointer to %p\n", (*pool).num_threads,
-         (*pool).threads);
   return pool;
 }
 
