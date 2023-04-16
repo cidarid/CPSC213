@@ -76,6 +76,7 @@ void* agent(void* av) {
   for (int i = 0; i < NUM_ITERATIONS; i++) {
     int r = random() % 6;
     switch (r) {
+      // Match, paper
       case 0:
         signal_count[TOBACCO]++;
         VERBOSE_PRINT("match available\n");
@@ -83,6 +84,7 @@ void* agent(void* av) {
         VERBOSE_PRINT("paper available\n");
         uthread_cond_signal(a->paper);
         break;
+      // Match, tobacco
       case 1:
         signal_count[PAPER]++;
         VERBOSE_PRINT("match available\n");
@@ -90,6 +92,7 @@ void* agent(void* av) {
         VERBOSE_PRINT("tobacco available\n");
         uthread_cond_signal(a->tobacco);
         break;
+      // Paper, tobacco
       case 2:
         signal_count[MATCH]++;
         VERBOSE_PRINT("paper available\n");
@@ -97,6 +100,7 @@ void* agent(void* av) {
         VERBOSE_PRINT("tobacco available\n");
         uthread_cond_signal(a->tobacco);
         break;
+      // Paper, match
       case 3:
         signal_count[TOBACCO]++;
         VERBOSE_PRINT("paper available\n");
@@ -104,6 +108,7 @@ void* agent(void* av) {
         VERBOSE_PRINT("match available\n");
         uthread_cond_signal(a->match);
         break;
+      // Tobacco, match
       case 4:
         signal_count[PAPER]++;
         VERBOSE_PRINT("tobacco available\n");
@@ -111,6 +116,7 @@ void* agent(void* av) {
         VERBOSE_PRINT("match available\n");
         uthread_cond_signal(a->match);
         break;
+      // Tobacco, paper
       case 5:
         signal_count[MATCH]++;
         VERBOSE_PRINT("tobacco available\n");
