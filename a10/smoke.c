@@ -8,7 +8,7 @@
 #include "uthread.h"
 #include "uthread_mutex_cond.h"
 
-#define NUM_ITERATIONS 1000
+#define NUM_ITERATIONS 10
 
 #ifdef VERBOSE
 #define VERBOSE_PRINT(S, ...) printf(S, ##__VA_ARGS__)
@@ -34,11 +34,6 @@ struct Agent* createAgent() {
   return agent;
 }
 
-//
-// TODO
-// You will probably need to add some procedures and struct etc.
-//
-
 /**
  * You might find these declarations helpful.
  *   Note that Resource enum had values 1, 2 and 4 so you can combine resources;
@@ -53,6 +48,114 @@ int num_active_threads = 0;
 
 int signal_count[5];  // # of times resource signalled
 int smoke_count[5];   // # of times smoker with resource smoked
+
+int materials;
+uthread_cond_t paper_matches, paper_tobacco, tobacco_matches;
+
+void wake_smoker(int available_materials) {
+  VERBOSE_PRINT("Attempting to wake up smoker with materials of %d\n",
+                materials);
+  switch (available_materials) {
+    case PAPER + MATCH:
+      VERBOSE_PRINT("Waking up tobacco smoker\n");
+      uthread_cond_signal(paper_matches);
+      materials = 0;
+      break;
+    case PAPER + TOBACCO:
+      VERBOSE_PRINT("Waking up matches smoker\n");
+      uthread_cond_signal(paper_tobacco);
+      materials = 0;
+      break;
+    case TOBACCO + MATCH:
+      VERBOSE_PRINT("Waking up paper smoker\n");
+      uthread_cond_signal(tobacco_matches);
+      materials = 0;
+      break;
+    default:
+      VERBOSE_PRINT("Invalid materials\n");
+      break;
+  }
+}
+
+/*
+Handlers
+These handle updating the materials when a material becomes available
+*/
+
+void* tobacco_handler(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(a->tobacco);
+    materials += TOBACCO;
+    wake_smoker(materials);
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+void* matches_handler(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(a->match);
+    materials += MATCH;
+    wake_smoker(materials);
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+void* paper_handler(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(a->paper);
+    materials += PAPER;
+    wake_smoker(materials);
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+/*
+Smokers
+These actually trigger the smoking of the smokers, and are only triggered when 2
+materials are available.
+*/
+
+void* tobacco_smoker(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(paper_matches);
+    VERBOSE_PRINT("Tobacco smoker is smoking\n");
+    uthread_cond_signal(a->smoke);
+    smoke_count[TOBACCO]++;
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+void* paper_smoker(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(tobacco_matches);
+    VERBOSE_PRINT("Paper smoker is smoking\n");
+    uthread_cond_signal(a->smoke);
+    smoke_count[PAPER]++;
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+void* match_smoker(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(paper_tobacco);
+    VERBOSE_PRINT("Matches smoker is smoking\n");
+    uthread_cond_signal(a->smoke);
+    smoke_count[MATCH]++;
+  }
+  uthread_mutex_unlock(a->mutex);
+}
 
 /**
  * This is the agent procedure.  It is complete and you shouldn't change it in
@@ -139,11 +242,27 @@ int main(int argc, char** argv) {
 
   uthread_init(5);
 
-  // TODO
+  paper_matches = uthread_cond_create(a->mutex);
+  paper_tobacco = uthread_cond_create(a->mutex);
+  tobacco_matches = uthread_cond_create(a->mutex);
+
+  uthread_create(tobacco_handler, a);
+  uthread_create(paper_handler, a);
+  uthread_create(matches_handler, a);
+  uthread_create(tobacco_smoker, a);
+  uthread_create(match_smoker, a);
+  uthread_create(paper_smoker, a);
 
   agent_thread = uthread_create(agent, a);
+  num_active_threads += 3;
   uthread_join(agent_thread, NULL);
 
+  VERBOSE_PRINT("Match: %d signals, %d smokes\n", signal_count[MATCH],
+                smoke_count[MATCH]);
+  VERBOSE_PRINT("Paper: %d signals, %d smokes\n", signal_count[PAPER],
+                smoke_count[PAPER]);
+  VERBOSE_PRINT("Tobacco: %d signals, %d smokes\n", signal_count[TOBACCO],
+                smoke_count[TOBACCO]);
   assert(signal_count[MATCH] == smoke_count[MATCH]);
   assert(signal_count[PAPER] == smoke_count[PAPER]);
   assert(signal_count[TOBACCO] == smoke_count[TOBACCO]);
