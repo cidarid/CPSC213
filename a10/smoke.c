@@ -133,18 +133,6 @@ void* tobacco_smoker(void* v) {
   uthread_mutex_unlock(a->mutex);
 }
 
-void* paper_smoker(void* v) {
-  struct Agent* a = v;
-  uthread_mutex_lock(a->mutex);
-  while (1) {
-    uthread_cond_wait(tobacco_matches);
-    VERBOSE_PRINT("Paper smoker is smoking\n");
-    uthread_cond_signal(a->smoke);
-    smoke_count[PAPER]++;
-  }
-  uthread_mutex_unlock(a->mutex);
-}
-
 void* match_smoker(void* v) {
   struct Agent* a = v;
   uthread_mutex_lock(a->mutex);
@@ -153,6 +141,18 @@ void* match_smoker(void* v) {
     VERBOSE_PRINT("Matches smoker is smoking\n");
     uthread_cond_signal(a->smoke);
     smoke_count[MATCH]++;
+  }
+  uthread_mutex_unlock(a->mutex);
+}
+
+void* paper_smoker(void* v) {
+  struct Agent* a = v;
+  uthread_mutex_lock(a->mutex);
+  while (1) {
+    uthread_cond_wait(tobacco_matches);
+    VERBOSE_PRINT("Paper smoker is smoking\n");
+    uthread_cond_signal(a->smoke);
+    smoke_count[PAPER]++;
   }
   uthread_mutex_unlock(a->mutex);
 }
@@ -247,8 +247,8 @@ int main(int argc, char** argv) {
   tobacco_matches = uthread_cond_create(a->mutex);
 
   uthread_create(tobacco_handler, a);
-  uthread_create(paper_handler, a);
   uthread_create(matches_handler, a);
+  uthread_create(paper_handler, a);
   uthread_create(tobacco_smoker, a);
   uthread_create(match_smoker, a);
   uthread_create(paper_smoker, a);
