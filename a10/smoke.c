@@ -8,7 +8,7 @@
 #include "uthread.h"
 #include "uthread_mutex_cond.h"
 
-#define NUM_ITERATIONS 10
+#define NUM_ITERATIONS 10000
 
 #ifdef VERBOSE
 #define VERBOSE_PRINT(S, ...) printf(S, ##__VA_ARGS__)
