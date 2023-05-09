@@ -2,6 +2,7 @@
 
 This repository contains all of the code that I created (or worked in a team to create) at the University of British Columbia for the course CPSC213: Introduction to Computer Systems, from January 2023 to April 2023. The projects are in a mix of Java, C, and an assembly like language called SM213 that was used in the course. The ISA for SM213 can be found [here](https://www.cs.ubc.ca/~tmm/courses/213-12F/resources/isa.pdf).
 
+<!--
 ## A1
 
 Assignment 1 focused on finding the endianness of any given number. Skeleton functions were given to me, and I implemented all of the functions in both [Endianness.java](/a1/Endianness.java) and [HelloWorld.java](a1/HelloWorld.java). All code in this assignment was written by me. The final task of Assignment 1 was to implement the main memory of our assembly simulator in the file [MainMemory.java](sm213/arch/sm213/machine/student/MainMemory.java).
@@ -21,3 +22,18 @@ In A4, I worked on [Part 2](/a4/p2) and [Part 3](/a4/p3). My partner completed [
 ## A5
 
 In A5, I completed an implementation of C's `malloc` function. My partner completed all other parts. My implementation is in [myheap.c](a5/myheap.c). The following 5 functions were implemented by me: [`myheap_malloc`](a5/myheap.c#L205), [`myheap_free`](/a5/myheap.c#L191), [`get_size_to_allocate`](/a5/myheap.c#L133), [`coalesce`](/a5/myheap.c#L113), and [`split_and_mark_used`](/a5/myheap.c#L151). These functions simulate how malloc works in C, storing, freeing, and splitting memory blocks on the heap as needed.
+
+## A6
+
+A6 focused on converting C code to 213's assembly implementation, SM213. I completed [Q2](https://github.com/cidarid/CPSC213/tree/main/a06/q2) and [Q3](https://github.com/cidarid/CPSC213/tree/main/a06/q3), while my partner completed [Q1](https://github.com/cidarid/CPSC213/tree/main/a06/q2). Q2 focused on converting small blocks of code like if statements into assembly, while in Q3 I coded a bubble sort implementation in assembly. 
+
+## A7
+
+
+
+## A8
+
+## A9
+
+## A10
+-->
